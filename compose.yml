@@ -15,11 +15,17 @@ services:
       - postgres_passwd
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U redmine -d redmine"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   redmine:
     image: redmine:latest
     container_name: redmine
-    restart: always
+    restart: unless-stopped
     environment:
       REDMINE_DB_POSTGRES: postgres
       REDMINE_DB_DATABASE: redmine
@@ -30,10 +36,19 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+        restart: true
     volumes:
       - redmine-data:/usr/src/redmine/files
       - gitolite_home:/var/lib/gitolite:ro
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 
   # gitlab:
     # image: 'gitlab/gitlab-ce:latest'
