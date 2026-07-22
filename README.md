@@ -73,6 +73,8 @@ docker-compose up -d
 
 ## Send mail through Google - Untested
 
+1. Edit  `config/configuration.yml`
+
 ```yaml
 production:
   delivery_method: :smtp
@@ -84,5 +86,17 @@ production:
     authentication: :plain
     user_name: "your_email@gmail.com"
     password: "your_password"
+```
+
+2. Copy configuration to container
+
+```sh
+docker cp config/configuration.yml redmine:/usr/src/redmine/config
+```
+
+3. Restart the container
+
+```sh
+docker container restart -s 15 -t 10 redmine
 ```
 
