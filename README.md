@@ -71,7 +71,14 @@ To start the services, run:
 docker-compose up -d
 ```
 
-## Send mail through Google - Untested
+## Send mail through Google
+
+### Google account prerequisites
+
+- Must have *2FA* enabled
+- Generate an *application password* for redmine, a 16 char string `1111222233334444`
+
+### Update redmine container
 
 1. Edit  `config/configuration.yml`
 
@@ -85,13 +92,15 @@ production:
     domain: "smtp.gmail.com"
     authentication: :plain
     user_name: "your_email@gmail.com"
-    password: "your_password"
+    password: "1111222233334444"
 ```
 
 2. Copy configuration to container
 
 ```sh
 docker cp config/configuration.yml redmine:/usr/src/redmine/config
+docker exec redmine chown redmine:redmine /usr/src/redmine/config/configuration.yml
+docker exec redmine chmod 640 /usr/src/redmine/config/configuration.yml
 ```
 
 3. Restart the container
